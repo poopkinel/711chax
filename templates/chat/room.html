@@ -16,19 +16,24 @@
       <tbody>
         {% for message in messages %}
           <tr>
-            <td>{{ message.formatted_timestamp }}</td>
+            <td class="quiet">{{ message.formatted_timestamp }}</td>
             <td>{{ message.handle }}</td>
             <td>{{ message.message }}</td>
-          </tr> 
+          </tr>
         {% endfor %}
       </tbody>
       <tfoot>
-      <tr>
-        <td>Say something:</td>
-        <td colspan=2>
-          <input id="message" type="text" placeholder="message">
-          <button type="submit" id="go">Say it</button>
-        </td>
+        <tr id="button_entry" style="display:inline">
+          <td><button type="button" id="ok">ok</button></td>
+          <td><button type="button" id="question">?</button></td>
+        </tr>
+        <tr id="message_entry" style="display:none">
+          <td>Say something:</td>
+          <td colspan=2>
+            <input id="message" type="text" placeholder="message">
+            <button type="submit" id="go">Say it</button>
+          </td>
+        </tr>
       </tfoot>
     </table>
   </form>

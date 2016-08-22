@@ -5,6 +5,7 @@ import dj_database_url
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+# PROJECT_DIR = os.path.abspath(os.path.dirname(__file__))
 
 SECRET_KEY = os.environ.get("SECRET_KEY", "".join(random.choice(string.printable) for i in range(40)))
 DEBUG = os.environ.get("DEBUG", False)
@@ -55,8 +56,24 @@ TEMPLATES = (
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
 
 DATABASES = {
-    'default': dj_database_url.config(default="postgres:///channels-example", conn_max_age=500)
+    'default': { 
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(PROJECT_ROOT, 'mydb.db'),
+    }
+    #'default': dj_database_url.config(default="postgres://ok:okokok@localhost:8001/channels-db", conn_max_age=500)
+    #'default': dj_database_url.config(default="sqlite:///home/ok/PycharmProjects/chatroom/env/channels-example/sqlitedb", conn_max_age=500)
 }
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+
 
 AUTH_PASSWORD_VALIDATORS = (
     {

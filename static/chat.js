@@ -3,11 +3,10 @@ $(function() {
     var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
     var chatsock = new ReconnectingWebSocket(ws_scheme + '://' + window.location.host + "/chat" + window.location.pathname);
     var messageRequirements = '';
-    var otherSpoke = false;
+    var otherSpoke = true;
 
     // Local Functions (static)
 
-    // check I asked a question
     function checkMessageValidity(message) {
         if (message.indexOf(messageRequirements) >= 0){
             return true;
@@ -17,27 +16,19 @@ $(function() {
         }
     }
 
-    function switchTalkMode(currentTalkingStick) {
-        if (currentTalkingStick == false) {
+    function toggleButtons(display) {
+        if (display == false) {
             $("#button_entry").hide();
             $("#message_entry").show();
             messageRequirements = '';
             $("#message").val('').focus();
         }
         else {
-            $("#button_entry").show();
-            $("#message_entry").hide();
-//            $("#message").val('').focus();
-            talkingStick = false;
+
         }
     }
 
-    // Handling Button Events
-
-    $("#button_ok").click(switchTalkMode(otherSpoke));
-    $("#button_question").click(switchTalkMode(otherSpoke));
-
-
+    // When a new message is sent to the server
     chatsock.onmessage = function(message) {
         var data = JSON.parse(message.data);
         var chat = $("#chat")
@@ -55,17 +46,28 @@ $(function() {
 
         chat.append(ele)
 
-//        if (data.handle != $("#handle").val()){
-//            $("#message").val('got answer').focus();
-//        }
-//            otherSpoke = true;
-//        }
-//        else {
-//            otherSpoke = false;
-//            $("#handle").val('no answer yet').focus();
-//        }
-
+        if (data.handle != $("#handle").val()){
+            $("#message").val('got answer').focus();
+            // show buttons
+            $("#button_entry").show();
+            $("#message_entry").hide();
+        }
     };
+
+    // Handling Button Events
+    $("#button_ok").click(function() {
+        $("#button_entry").hide();
+        $("#message_entry").show();
+        messageRequirements = '';
+        $("#message").val('').focus();
+    });
+
+    $("#button_question").click(function() {
+        $("#button_entry").hide();
+        $("#message_entry").show();
+        messageRequirements = '?';
+        $("#message").val('').focus();
+    });
 
 
     $("#chatform").on("submit", function(event) {

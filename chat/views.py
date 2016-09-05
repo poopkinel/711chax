@@ -8,6 +8,7 @@ from .models import Room
 def about(request):
     return render(request, "chat/about.html")
 
+
 def new_room(request):
     """
     Randomly create a new room, and redirect to it.

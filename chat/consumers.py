@@ -55,18 +55,29 @@ def ws_receive(message):
     except ValueError:
         log.debug("ws message isn't json text=%s", text)
         return
-    
-    if set(data.keys()) != set(('handle', 'message')):
+
+    message_keys = set(data.keys())
+    if message_keys not in [set(('handle', 'message')), set(('reference'))]:
         log.debug("ws message unexpected format data=%s", data)
         return
 
     if data:
-        log.debug('chat message room=%s handle=%s message=%s', 
-            room.label, data['handle'], data['message'])
-        m = room.messages.create(**data)
+        if message_keys == set(('handle', 'message')):
+            log.debug('chat message room=%s handle=%s message=%s',
+                room.label, data['handle'], data['message'])
+            m = room.messages.create(**data)
 
-        # See above for the note about Group
-        Group('chat-'+label, channel_layer=message.channel_layer).send({'text': json.dumps(m.as_dict())})
+            # See above for the note about Group
+            Group('chat-'+label, channel_layer=message.channel_layer).send({'text': json.dumps(m.as_dict())})
+
+        elif message_keys == set(('reference')):
+            log.debug('chat reference room=%s reference=%s',
+                      room.label, data['reference'])
+            r = room.add_ref(data['reference'])  # TODO - in room.add_ref return ref dict
+
+            # Notify room member of reference
+            Group('chat-'+label, channel_layer=message.channel_layer).send({'reference': r})  # TODO - edit send
+
 
 @channel_session
 def ws_disconnect(message):

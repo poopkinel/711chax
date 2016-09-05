@@ -34,12 +34,26 @@
             <button type="submit" id="go">Say it</button>
           </td>
         </tr>
-        <tr id="" style="display:none">
+      </tfoot>
+    </table>
+  </form>
+  <form id="referform">
+    <table id="refer">
+      <thead>
+        <tr>
+          <td class="quiet">Refer related rooms from this room</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><input id="referred_room" type="text" placeholder="Other Room"></td>
+           <!-- add search functionality-->
           <td>
-            <label>Waiting for Response</label>
+            <button type="submit" id="button_refer">Refer</button>
+            <span class="popuptext" id="refer_popup"></span>
           </td>
         </tr>
-      </tfoot>
+      </tbody>
     </table>
   </form>
 {% endblock content %}

@@ -2,8 +2,9 @@ $(function() {
     // When we're using HTTPS, use WSS too.
     var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
     var chatsock = new ReconnectingWebSocket(ws_scheme + '://' + window.location.host + "/chat" + window.location.pathname);
+//    var refsock = new ReconnectingWebSocket(ws_scheme + '://' + window.location.host + "/refer" + window.location.pathname);
+
     var messageRequirements = '';
-    var otherSpoke = true;
 
     // Local Functions (static)
 
@@ -16,41 +17,43 @@ $(function() {
         }
     }
 
-    function toggleButtons(display) {
-        if (display == false) {
-            $("#button_entry").hide();
-            $("#message_entry").show();
-            messageRequirements = '';
-            $("#message").val('').focus();
-        }
-        else {
-
-        }
-    }
-
     // When a new message is sent to the server
     chatsock.onmessage = function(message) {
         var data = JSON.parse(message.data);
-        var chat = $("#chat")
-        var ele = $('<tr></tr>')
+//        $("#handle").val(Object.keys(data)).focus(); // DEBUG
+        if (Object.keys(data) == ['timestamp', 'message', 'handle']){
 
-        ele.append(
-            $("<td class=\"quiet\"></td>").text(data.timestamp)
-        )
-        ele.append(
-            $("<td></td>").text(data.handle)
-        )
-        ele.append(
-            $("<td></td>").text(data.message)
-        )
+            var chat = $("#chat")
+            var ele = $('<tr></tr>')
 
-        chat.append(ele)
+            ele.append(
+                $("<td class=\"quiet\"></td>").text(data.timestamp)
+            )
+            ele.append(
+                $("<td></td>").text(data.handle)
+            )
+            ele.append(
+                $("<td></td>").text(data.message)
+            )
 
-        if (data.handle != $("#handle").val()){
-            $("#message").val('got answer').focus();
-            // show buttons
-            $("#button_entry").show();
-            $("#message_entry").hide();
+            chat.append(ele)
+
+            if (data.handle != $("#handle").val()){
+                $("#message").val('got answer').focus(); // DEBUG
+                // show buttons
+                $("#button_entry").show();
+                $("#message_entry").hide();
+            }
+        }
+
+        // TODO - REQUIRES DEBUGGING
+        if (Object.keys(data) == ['reference']) {
+            // popup a reference was made
+            $("#refer_popup").val('this room was referred to ' + data.reference)
+            $("#refer_popup").show()
+            setTimeout(function (){
+                $("#refer_popup").hide()
+            } ,5000);
         }
     };
 
@@ -67,6 +70,16 @@ $(function() {
         $("#message_entry").show();
         messageRequirements = '?';
         $("#message").val('').focus();
+    });
+
+
+    // Sending chat messages and references through the WebSocket
+    $("#referform").on("submit", function(event) {
+        var message = {
+            reference: $("#referred_room").val(),
+        }
+        chatsock.send(JSON.stringify(message));
+        return false;
     });
 
 

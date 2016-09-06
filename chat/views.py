@@ -34,8 +34,10 @@ def chat_room(request, label):
     room, created = Room.objects.get_or_create(label=label)
 
     messages = reversed(room.messages.order_by('-timestamp')[:])
+    references = room.referred_rooms.all().values_list('label', flat=True)
 
     return render(request, "chat/room.html", {
         'room': room,
         'messages': messages,
+        'references': references,
     })

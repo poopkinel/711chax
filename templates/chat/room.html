@@ -46,14 +46,25 @@
       </thead>
       <tbody>
         <tr>
-          <td><input id="referred_room" type="text" placeholder="Other Room"></td>
+          <td><input id="refer_entry" type="text" placeholder="Other Room"></td>
            <!-- TODO add search functionality-->
           <td>
-            <button type="submit" id="button_refer">Refer</button>
-            <span class="popuptext" id="refer_popup"></span>
+            <button type="button" id="button_refer">Refer</button>
           </td>
         </tr>
       </tbody>
+      <tfoot>
+        <tr>
+          <td>
+            <label>Room References</label>
+            <div id="popup" class="popup">
+              {% for ref in references %}
+                <li class="popuptext" id="refer_popup">{{ ref }}</li>
+              {% endfor %}
+            </div>
+          </td>
+        </tr>
+      </tfoot>
     </table>
   </form>
 {% endblock content %}

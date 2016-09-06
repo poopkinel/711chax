@@ -53,30 +53,40 @@ def ws_receive(message):
     try:
         data = json.loads(message['text'])
     except ValueError:
-        log.debug("ws message isn't json text=%s", text)
+        log.debug("ws message isn't json text=%s", message['text'])
         return
 
-    message_keys = set(data.keys())
-    if message_keys not in [set(('handle', 'message')), set(('reference'))]:
+    log.debug("message_keys(type %s): %s", type(data.keys()), data.keys())
+    log.debug("message type: %s", data['type'])
+    # if message_keys not in [set([u'handle', u'message']), set(['reference'])]:
+    if 'type' not in data:
         log.debug("ws message unexpected format data=%s", data)
         return
 
     if data:
-        if message_keys == set(('handle', 'message')):
+        if data['type'] == 'message':
             log.debug('chat message room=%s handle=%s message=%s',
                 room.label, data['handle'], data['message'])
-            m = room.messages.create(**data)
+            m = room.messages.create(handle=data['handle'],
+                                     message=data['message'])
 
+            reply = dict(type='message', **m.as_dict())
             # See above for the note about Group
-            Group('chat-'+label, channel_layer=message.channel_layer).send({'text': json.dumps(m.as_dict())})
+            Group('chat-'+label, channel_layer=message.channel_layer).send({'text': json.dumps(reply)})
+            # Group('chat-'+label, channel_layer=message.channel_layer).send(m.as_dict())
+            log.debug("group message sent %s", reply)
 
-        elif message_keys == set(('reference')):
+        elif data['type'] == 'reference':
             log.debug('chat reference room=%s reference=%s',
                       room.label, data['reference'])
-            r = room.add_ref(data['reference'])  # TODO - in room.add_ref return ref dict
-
+            referred_room_label = re.sub(r'[^a-zA-z0-9]+', '-', data['reference'])
+            referred_room = Room.objects.get_or_create(label=referred_room_label)[0]
+            room.referred_rooms.add(referred_room)  # TODO - DEBUG
+            room.save()
             # Notify room member of reference
-            Group('chat-'+label, channel_layer=message.channel_layer).send({'reference': r})  # TODO - edit send
+            reply = {'referred_room': referred_room_label, 'type': 'reference'}
+            Group('chat-'+label, channel_layer=message.channel_layer).send({'text': json.dumps(reply)})
+            log.debug("group reference sent %s", reply)
 
 
 @channel_session

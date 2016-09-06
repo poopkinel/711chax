@@ -20,9 +20,7 @@ $(function() {
     // When a new message is sent to the server
     chatsock.onmessage = function(message) {
         var data = JSON.parse(message.data);
-//        $("#handle").val(Object.keys(data)).focus(); // DEBUG
-        if (Object.keys(data) == ['timestamp', 'message', 'handle']){
-
+        if (data.type == 'message'){
             var chat = $("#chat")
             var ele = $('<tr></tr>')
 
@@ -39,21 +37,16 @@ $(function() {
             chat.append(ele)
 
             if (data.handle != $("#handle").val()){
-                $("#message").val('got answer').focus(); // DEBUG
                 // show buttons
                 $("#button_entry").show();
                 $("#message_entry").hide();
             }
         }
 
-        // TODO - REQUIRES DEBUGGING
-        if (Object.keys(data) == ['reference']) {
+        else if (data.type == 'reference') {
             // popup a reference was made
-            $("#refer_popup").val('this room was referred to ' + data.reference)
-            $("#refer_popup").show()
-            setTimeout(function (){
-                $("#refer_popup").hide()
-            } ,5000);
+            child = '<li class="popuptext" id="refer_popup">this room was referred to '+data.referred_room+'</li>'
+            $("#popup").append(child);
         }
     };
 
@@ -74,17 +67,20 @@ $(function() {
 
 
     // Sending chat messages and references through the WebSocket
-    $("#referform").on("submit", function(event) {
+    $("#button_refer").click(function() {
         var message = {
-            reference: $("#referred_room").val(),
+            type: 'reference',
+            reference: $("#refer_entry").val(),
         }
         chatsock.send(JSON.stringify(message));
+        $("#handle").val('JSON sent:'+JSON.stringify(message)).focus();
         return false;
     });
 
 
     $("#chatform").on("submit", function(event) {
         var message = {
+            type: 'message',
             handle: $('#handle').val(),
             message: $('#message').val(),
         }

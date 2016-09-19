@@ -4,5 +4,6 @@ from . import views
 urlpatterns = [
     url(r'^$',  views.about, name='about'),
     url(r'^new/$', views.new_room, name='new_room'),
+    # url(r'^roomlist/$', views.room_list, name='room_list'),
     url(r'^(?P<label>[\w-]{,50})/$', views.chat_room, name='chat_room'),
 ]

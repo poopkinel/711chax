@@ -73,7 +73,6 @@ $(function() {
             reference: $("#refer_entry").val(),
         }
         chatsock.send(JSON.stringify(message));
-        $("#handle").val('JSON sent:'+JSON.stringify(message)).focus();
         return false;
     });
 

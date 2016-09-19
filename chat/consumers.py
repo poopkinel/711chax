@@ -58,7 +58,7 @@ def ws_receive(message):
 
     log.debug("message_keys(type %s): %s", type(data.keys()), data.keys())
     log.debug("message type: %s", data['type'])
-    # if message_keys not in [set([u'handle', u'message']), set(['reference'])]:
+
     if 'type' not in data:
         log.debug("ws message unexpected format data=%s", data)
         return

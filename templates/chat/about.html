@@ -3,11 +3,21 @@
 {% block content %}
   <h1>Welcome to Chat Rooms</h1>
   <p class="deck">
-    You can visit <code>{{ request.scheme }}://{{ request.get_host }}/any-path-you-want</code>
-    to create a arbitrary room or join one whose name you know.
+    What Room interests You?
   </p>
   <p>
-    <a class="button button-primary" href="{% url 'new_room' %}">Show Open Rooms</a>
+    <!--<a class="button button-primary" href="{% url 'new_room' %}">Show Open Rooms</a>-->
+    <div class="container">
+      {% for r in rooms_list %}
+      <a href="{% url 'chat_room' r %}" class="button hvr-grow"
+         style="margin-right:3px;margin-left:3px">{{ r }}</a>
+       <!--<div class="one column">{{ r }}</div>-->
+      {% endfor %}
+    </div>
+  </p>
+  <p>
+    Alternatively, You can visit <code>{{ request.scheme }}://{{ request.get_host }}/any-path-you-want</code>
+    to create a arbitrary room or join one whose name you know.
   </p>
   <p class="quiet">
       Have Fun! :)
